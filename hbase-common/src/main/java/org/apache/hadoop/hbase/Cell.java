@@ -23,6 +23,7 @@ import org.apache.hadoop.hbase.classification.InterfaceStability;
 
 
 /**
+ * 可以认为是sstable 核心kv对数据，这个为单列原子存储
  * The unit of storage in HBase consisting of the following fields:
  * <br>
  * <pre>

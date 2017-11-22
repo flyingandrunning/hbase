@@ -46,6 +46,7 @@ import org.apache.hadoop.io.RawComparator;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
+ * kv列式存储的核心实现，也是sstable基础数据
  * An HBase Key/Value. This is the fundamental HBase Type.
  * <p>
  * HBase applications and users should use the Cell interface and avoid directly using KeyValue
@@ -95,17 +96,20 @@ public class KeyValue implements Cell, HeapSize, Cloneable, SettableSequenceId, 
     new byte[]{COLUMN_FAMILY_DELIMITER};
 
   /**
+   * 达到一定的阈值后进行sstable合并
    * Comparator for plain key/values; i.e. non-catalog table key/values. Works on Key portion
    * of KeyValue only.
    */
   public static final KVComparator COMPARATOR = new KVComparator();
   /**
+   * 元信息合并
    * A {@link KVComparator} for <code>hbase:meta</code> catalog table
    * {@link KeyValue}s.
    */
   public static final KVComparator META_COMPARATOR = new MetaComparator();
 
   /**
+   * 布隆合并
    * Needed for Bloom Filters.
    */
   public static final KVComparator RAW_COMPARATOR = new RawBytesComparator();
@@ -218,6 +222,7 @@ public class KeyValue implements Cell, HeapSize, Cloneable, SettableSequenceId, 
   }
 
   /**
+   * 操作类型
    * Key type.
    * Has space for other key types to be added later.  Cannot rely on
    * enum ordinals . They change if item is removed or moved.  Do our own codes.
@@ -270,9 +275,9 @@ public class KeyValue implements Cell, HeapSize, Cloneable, SettableSequenceId, 
 
   ////
   // KeyValue core instance fields.
-  protected byte [] bytes = null;  // an immutable byte array that contains the KV
-  protected int offset = 0;  // offset into bytes buffer KV starts at
-  protected int length = 0;  // length of the KV starting from offset.
+  protected byte [] bytes = null;  // an immutable byte array that contains the KV 具体的byte数组内容
+  protected int offset = 0;  // offset into bytes buffer KV starts at kv开始的位置
+  protected int length = 0;  // length of the KV starting from offset. kv内容的长度
 
   /**
    * @return True if a delete type, a {@link KeyValue.Type#Delete} or
@@ -850,6 +855,7 @@ public class KeyValue implements Cell, HeapSize, Cloneable, SettableSequenceId, 
     }
 
     // Allocate right-sized byte array.
+    //核心板块，存储格式协议处理，以及字节序列化存储
     byte[] bytes= new byte[(int) getKeyValueDataStructureSize(rlength, flength, qlength, vlength,
         tagsLength)];
     // Write the correct size markers
@@ -916,7 +922,7 @@ public class KeyValue implements Cell, HeapSize, Cloneable, SettableSequenceId, 
    * Write KeyValue format into the provided byte array.
    *
    * @param buffer the bytes buffer to use
-   * @param boffset buffer offset
+   * @param boffset buffer offset 当前最近的字节码位置，方便下一个cell (kv)数值存储
    * @param row row key
    * @param roffset row offset
    * @param rlength row length
@@ -963,6 +969,7 @@ public class KeyValue implements Cell, HeapSize, Cloneable, SettableSequenceId, 
     }
 
     // Write key, value and key row length.
+    //字节码序列化存储
     int pos = boffset;
     pos = Bytes.putInt(buffer, pos, keyLength);
     pos = Bytes.putInt(buffer, pos, vlength);
