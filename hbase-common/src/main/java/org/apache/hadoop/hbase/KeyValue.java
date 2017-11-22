@@ -96,20 +96,20 @@ public class KeyValue implements Cell, HeapSize, Cloneable, SettableSequenceId, 
     new byte[]{COLUMN_FAMILY_DELIMITER};
 
   /**
-   * 达到一定的阈值后进行sstable合并
+   * 对比
    * Comparator for plain key/values; i.e. non-catalog table key/values. Works on Key portion
    * of KeyValue only.
    */
   public static final KVComparator COMPARATOR = new KVComparator();
   /**
-   * 元信息合并
+   * 对比器
    * A {@link KVComparator} for <code>hbase:meta</code> catalog table
    * {@link KeyValue}s.
    */
   public static final KVComparator META_COMPARATOR = new MetaComparator();
 
   /**
-   * 布隆合并
+   * 布隆对比
    * Needed for Bloom Filters.
    */
   public static final KVComparator RAW_COMPARATOR = new RawBytesComparator();
