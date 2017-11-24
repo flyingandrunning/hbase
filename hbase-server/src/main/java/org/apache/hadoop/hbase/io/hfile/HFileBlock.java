@@ -159,6 +159,7 @@ public class HFileBlock implements Cacheable {
   }
 
     // Todo: encapsulate Header related logic in this inner class.
+  //HFile内部协议头
   static class Header {
     // Format of header is:
     // 8 bytes - block magic
@@ -197,6 +198,7 @@ public class HFileBlock implements Cacheable {
   private final int onDiskDataSizeWithHeader;
 
   /** The in-memory representation of the hfile block */
+  //sstable内存数据模式
   private ByteBuffer buf;
 
   /** Meta data that holds meta information on the hfileblock */
@@ -921,6 +923,7 @@ public class HFileBlock implements Cacheable {
       // We will compress it later in finishBlock()
       userDataStream = new DataOutputStream(baosInMemory);
       if (newBlockType == BlockType.DATA) {
+        //进行字节数据编码
         this.dataBlockEncoder.startBlockEncoding(dataBlockEncodingCtx, userDataStream);
       }
       this.unencodedDataSizeWritten = 0;
@@ -933,7 +936,9 @@ public class HFileBlock implements Cacheable {
      * @throws IOException
      */
     public void write(Cell cell) throws IOException{
+      //状态机机制，做写处理，1.写磁盘，2.写缓存，这里优先写缓存，然后缓存到一定级别后进行刷盘，同时做lsm处理
       expectState(State.WRITING);
+      //数据编码处理,蒋数据刷到userDataStream
       this.unencodedDataSizeWritten += this.dataBlockEncoder.encode(cell, dataBlockEncodingCtx,
           this.userDataStream);
     }
@@ -1224,6 +1229,7 @@ public class HFileBlock implements Cacheable {
      * @param out the file system output stream
      * @throws IOException
      */
+    //数据写入，及数据刷盘
     public void writeBlock(BlockWritable bw, FSDataOutputStream out)
         throws IOException {
       bw.writeToBlock(startWriting(bw.getBlockType()));

@@ -43,6 +43,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.Writable;
 
 /**
+ * sstable,lsm底层数据存储结构分析
  * Writes HFile format version 2.
  */
 @InterfaceAudience.Private
@@ -283,6 +284,7 @@ public class HFileWriterV2 extends AbstractHFileWriter {
       }
     }
 
+    //做数据板块写入
     fsBlockWriter.write(cell);
 
     totalKeyLength += CellUtil.estimatedSerializedSizeOfKey(cell);

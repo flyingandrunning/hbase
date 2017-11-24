@@ -24,6 +24,8 @@ import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.io.HeapSize;
 
 /**
+ * 可以参考文档
+ * https://wuchanming.gitbooks.io/hbase/content/lsm%E6%A0%91%EF%BC%88log-structured-merge-tree%EF%BC%89%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E.html
  * The MemStore holds in-memory modifications to the Store. Modifications are {@link Cell}s.
  * <p>
  * The MemStore functions should not be called in parallel. Callers should hold write and read
